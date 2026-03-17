@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Formulario de redirección al checkout de Nave ─────────────────── -->
+    <!--
+        Odoo renderiza esta vista para ejecutar el redirect al checkout de Nave.
+        checkout_url viene de _get_specific_rendering_values() en payment_transaction.py.
+        Se usa un auto-submit para que el redirect sea inmediato y sin interacción del usuario.
+    -->
+    <template id="nave_redirect_form" name="Nave — Formulario de redirección">
+        <form
+            id="nave_redirect_form"
+            action="{{checkout_url}}"
+            method="get"
+            t-if="checkout_url"
+        >
+            <!-- Sin campos adicionales — Nave recibe todo via la API al crear la intención -->
+        </form>
+        <script>
+            document.getElementById('nave_redirect_form').submit();
+        </script>
+    </template>
+
+    <!-- ── Vista del proveedor en el backend ─────────────────────────────── -->
+    <record id="nave_provider_form" model="ir.ui.view">
+        <field name="name">payment.provider.nave.form</field>
+        <field name="model">payment.provider</field>
+        <field name="inherit_id" ref="payment.payment_provider_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page
+                    string="Credenciales Nave"
+                    attrs="{'invisible': [('code', '!=', 'nave')]}"
+                >
+                    <group>
+                        <group string="Credenciales de acceso">
+                            <field name="nave_client_id"
+                                   attrs="{'required': [('code', '=', 'nave')]}"/>
+                            <field name="nave_client_secret"
+                                   password="True"
+                                   attrs="{'required': [('code', '=', 'nave')]}"/>
+                            <field name="nave_pos_id"
+                                   attrs="{'required': [('code', '=', 'nave')]}"/>
+                        </group>
+                        <group string="Configuración">
+                            <field name="nave_duration_time"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        <p>
+                            <strong>Entorno Sandbox:</strong>
+                            Mientras el proveedor esté en modo <em>Test</em>, se usarán
+                            las URLs de sandbox de Nave. Activar a <em>Habilitado</em>
+                            para usar producción.
+                        </p>
+                        <p class="mb-0">
+                            Las credenciales se obtienen desde el portal B2B de Nave
+                            en <a href="https://navenegocios.com" target="_blank">navenegocios.com</a>.
+                        </p>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ── Columnas extra en la lista de transacciones ───────────────────── -->
+    <record id="nave_transaction_list" model="ir.ui.view">
+        <field name="name">payment.transaction.nave.list</field>
+        <field name="model">payment.transaction</field>
+        <field name="inherit_id" ref="payment.payment_transaction_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='reference']" position="after">
+                <field
+                    name="nave_payment_code"
+                    optional="show"
+                    string="N° Op. Nave"
+                    attrs="{'invisible': [('provider_code', '!=', 'nave')]}"
+                />
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ── Campos extra en el formulario de transacción ─────────────────── -->
+    <record id="nave_transaction_form" model="ir.ui.view">
+        <field name="name">payment.transaction.nave.form</field>
+        <field name="model">payment.transaction</field>
+        <field name="inherit_id" ref="payment.payment_transaction_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='provider_info']" position="after">
+                <group
+                    string="Nave"
+                    name="nave_info"
+                    attrs="{'invisible': [('provider_code', '!=', 'nave')]}"
+                >
+                    <field name="nave_payment_request_id" readonly="1"/>
+                    <field name="nave_status"             readonly="1"/>
+                    <field name="nave_payment_id"         readonly="1"/>
+                    <field name="nave_payment_status"     readonly="1"/>
+                    <field name="nave_payment_code"       readonly="1"/>
+                    <field name="nave_webhook_received_at" readonly="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

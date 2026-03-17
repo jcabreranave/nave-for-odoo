@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!--
+        Registro por defecto del proveedor Nave.
+        noupdate="1" → Odoo no sobreescribe este registro en actualizaciones del módulo,
+        preservando la configuración que el cliente ingresó (credenciales, estado, etc.).
+    -->
+    <record id="payment_provider_nave" model="payment.provider">
+        <field name="name">Nave</field>
+        <field name="code">nave</field>
+        <field name="state">disabled</field>
+        <field name="is_published">False</field>
+        <field name="nave_duration_time">900</field>
+        <field name="description" type="html">
+            <p>Pagá con tarjetas, MODO o QR de forma rápida y segura a través de Nave.</p>
+        </field>
+    </record>
+
+</odoo>

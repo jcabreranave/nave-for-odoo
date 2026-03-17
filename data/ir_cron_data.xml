@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!--
+        Cron de polling: safety net para transacciones Nave que quedaron en
+        estado 'draft' o 'pending' porque:
+        - El cliente cerró el navegador antes de volver al sitio.
+        - El webhook no llegó o falló silenciosamente.
+        Equivalente a CronHandler del plugin de WooCommerce.
+    -->
+    <record id="nave_cron_poll_pending" model="ir.cron">
+        <field name="name">Nave — Polling de transacciones pendientes</field>
+        <field name="model_id" ref="payment.model_payment_transaction"/>
+        <field name="state">code</field>
+        <field name="code">model._nave_cron_poll_pending()</field>
+        <field name="interval_number">15</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+        <field name="doall">False</field>
+    </record>
+
+</odoo>
